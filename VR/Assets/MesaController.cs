@@ -12,10 +12,14 @@ public class MesaController : MonoBehaviour
     private float tiempoRestante = 120f; // Tiempo en segundos (2 minutos)
     private bool tiempoFinalizado = false; // Controla si el tiempo ha terminado
 
+    public AudioClip musicForThisScene;
+
     private void Start()
     {
         ActualizarContadorUI(); // Inicializa el contador en la UI
         ActualizarTemporizadorUI(); // Inicializa el temporizador en la UI
+        MusicManager.instance.PlayMusic(musicForThisScene);
+        
     }
 
     private void Update()
