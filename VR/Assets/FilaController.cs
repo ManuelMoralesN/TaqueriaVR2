@@ -17,10 +17,19 @@ public class FilaController : MonoBehaviour
     }
 
     private void CrearNPC(int posicion)
+{
+    GameObject npc = Instantiate(npcPrefab, posicionesFila[posicion].position, Quaternion.identity);
+
+    NPCController npcController = npc.GetComponent<NPCController>();
+    if (npcController != null)
     {
-        GameObject npc = Instantiate(npcPrefab, posicionesFila[posicion].position, Quaternion.identity);
-        filaNPCs.Enqueue(npc);
+        npcController.filaController = this; // Conectar al controlador de fila
+        npcController.GenerarPedido(); // Generar el pedido inicial
     }
+
+    filaNPCs.Enqueue(npc);
+}
+
 
     public void AvanzarFila()
     {
@@ -38,7 +47,7 @@ public class FilaController : MonoBehaviour
             index++;
         }
 
-        // Crea un nuevo NPC al final de la fila
+        // Crea un nuevo NPC al final de la fila y genera su pedido
         CrearNPC(posicionesFila.Count - 1);
     }
 }
