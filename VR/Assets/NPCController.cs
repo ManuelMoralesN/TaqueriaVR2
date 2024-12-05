@@ -4,48 +4,35 @@ using System.Collections.Generic;
 
 public class NPCController : MonoBehaviour
 {
-    public TMP_Text pedidoText; // Referencia al pedido que se muestra sobre el NPC
+    public TMP_Text pedidoText; // Referencia al texto sobre el NPC
     public string pedidoActual; // El pedido asignado al NPC
     public bool atendido = false;
     public FilaController filaController;
 
-    private List<string> tiposTacos = new List<string> { "Pastor", "Suaperro" };
-    private List<string> tiposBebidas = new List<string> { "Coca bien fría", "Caguama" };
+    private List<string> tiposTacos = new List<string> { "Pastor", "Suaperro" }; // Solo Pastor y Suaperro
 
     void Start()
     {
-        GenerarPedido();
-    }
-
-    void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            AtenderPedido();
-        }
+        GenerarPedido(); // Genera el pedido al inicio
     }
 
     public void GenerarPedido()
     {
-        // Generar cantidades aleatorias entre 1 y 9
-        int cantidadTacos = Random.Range(1, 10);
-        int cantidadBebidas = Random.Range(1, 10);
-
-        // Elegir un tipo de taco y una bebida al azar
+        // Elegir un tipo de taco al azar
         string tacoSeleccionado = tiposTacos[Random.Range(0, tiposTacos.Count)];
-        string bebidaSeleccionada = tiposBebidas[Random.Range(0, tiposBebidas.Count)];
 
-        // Formar el pedido
-        pedidoActual = $"{cantidadTacos} tacos de {tacoSeleccionado} y {cantidadBebidas} {bebidaSeleccionada}(s)";
-        pedidoText.text = pedidoActual; // Actualiza el texto del pedido sobre el NPC
+        // Formar el pedido (siempre será un taco)
+        pedidoActual = $"1 taco de {tacoSeleccionado}";
+        pedidoText.text = pedidoActual; // Actualiza el texto sobre el NPC
     }
 
     public void AtenderPedido()
     {
-        if(!atendido){
-        atendido = false;
-        pedidoText.text = ""; // Borra el texto al atender
-        filaController.AvanzarFila();
+        if (!atendido)
+        {
+            atendido = true;
+            pedidoText.text = ""; // Borra el texto al atender
+            filaController.AvanzarFila(); // Llama al siguiente cliente
         }
     }
 }
