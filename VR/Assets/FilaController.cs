@@ -16,7 +16,7 @@ public class FilaController : MonoBehaviour
             CrearNPC(i);
         }
 
-        // Sincronizar el pedido del primer cliente con la mesa
+        // Actualizar el pedido del primer cliente en la mesa
         if (filaNPCs.Count > 0)
         {
             SincronizarPedidoConMesa();
@@ -45,7 +45,7 @@ public class FilaController : MonoBehaviour
             Destroy(npcAtendido, 1f); // Destruye el NPC tras atenderlo
         }
 
-        // Sincronizar el pedido del siguiente cliente con la mesa
+        // Actualizar el pedido del siguiente cliente en la mesa
         if (filaNPCs.Count > 0)
         {
             SincronizarPedidoConMesa();
@@ -59,7 +59,7 @@ public class FilaController : MonoBehaviour
             index++;
         }
 
-        // Crea un nuevo NPC al final de la fila y genera su pedido
+        // Crea un nuevo NPC al final de la fila
         CrearNPC(posicionesFila.Count - 1);
     }
 
@@ -70,7 +70,7 @@ public class FilaController : MonoBehaviour
             GameObject siguienteNPC = filaNPCs.Peek(); // Obtén el siguiente NPC
             NPCController npcController = siguienteNPC.GetComponent<NPCController>();
 
-            if (npcController != null && mesaController != null)
+            if (npcController != null)
             {
                 mesaController.pedidoEsperado = npcController.pedidoActual; // Actualiza el pedido esperado
             }

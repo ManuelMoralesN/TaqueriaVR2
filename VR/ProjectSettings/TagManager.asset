@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Taco
+  - CinemachineTarget
+  - TacoPastor
+  - TacoSuaperro
   layers:
   - Default
   - TransparentFX
