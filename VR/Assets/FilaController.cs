@@ -1,44 +1,88 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
 
 public class FilaController : MonoBehaviour
 {
-    public List<Transform> posicionesFila; // Puntos de espera en la fila
-    public GameObject npcPrefab; // Prefab de NPC
-    private Queue<GameObject> filaNPCs = new Queue<GameObject>();
+    [Header("Configuración")]
+    public Transform[] posicionesFila; // Array de posiciones de la fila
+    public Transform posicionOrden;    // Posición de la mesa para tomar pedidos
 
-    private void Start()
+    [Header("Configuración de NPCs")]
+    public GameObject prefabNPC;       // Prefab de los NPCs
+    public int maximoEnFila = 5;       // Máximo de NPCs en la fila
+
+    private Queue<GameObject> colaNPCs = new Queue<GameObject>(); // Cola de NPCs
+
+    void Start()
     {
-        // Crear NPCs iniciales
-        for (int i = 0; i < posicionesFila.Count; i++)
+        // Inicializa la fila con los NPCs
+        for (int i = 0; i < maximoEnFila; i++)
         {
             CrearNPC(i);
         }
     }
 
-    private void CrearNPC(int posicion)
+    void CrearNPC(int indice)
     {
-        GameObject npc = Instantiate(npcPrefab, posicionesFila[posicion].position, Quaternion.identity);
-        filaNPCs.Enqueue(npc);
+        // Crea un NPC en la posición correspondiente de la fila
+        GameObject nuevoNPC = Instantiate(prefabNPC, posicionesFila[indice].position, Quaternion.identity);
+        colaNPCs.Enqueue(nuevoNPC);
+        MoverNPCAPosicion(nuevoNPC, posicionesFila[indice]);
     }
 
-    public void AvanzarFila()
+    void MoverNPCAPosicion(GameObject npc, Transform posicionObjetivo)
     {
-        if (filaNPCs.Count > 0)
+        // Mueve al NPC a la posición objetivo utilizando NavMesh
+        NavMeshAgent agente = npc.GetComponent<NavMeshAgent>();
+        if (agente != null)
         {
-            GameObject npcAtendido = filaNPCs.Dequeue(); // Remueve al primero
-            Destroy(npcAtendido, 1f); // Destruye el NPC tras atenderlo
+            agente.SetDestination(posicionObjetivo.position);
+        }
+    }
+
+    public void ProcesarSiguienteNPC()
+    {
+        if (colaNPCs.Count > 0)
+        {
+            // Retira al primer NPC de la fila
+            GameObject npcActual = colaNPCs.Dequeue();
+
+            // Mueve al NPC a la mesa para tomar el pedido
+            MoverNPCAPosicion(npcActual, posicionOrden);
+
+            // Simula que el NPC se retira después de completar el pedido
+            StartCoroutine(RemoverNPCDespuesDeRetardo(npcActual));
         }
 
-        // Mueve a los NPCs restantes hacia adelante
-        int index = 0;
-        foreach (var npc in filaNPCs)
+        // Reorganiza la fila para los NPCs restantes
+        ReorganizarFila();
+    }
+     public void AvanzarFila()
+    {
+        // Llama a la lógica para procesar al siguiente NPC
+        ProcesarSiguienteNPC();
+    }
+    void ReorganizarFila()
+    {
+        int indice = 0;
+        foreach (GameObject npc in colaNPCs)
         {
-            npc.transform.position = posicionesFila[index].position;
-            index++;
+            MoverNPCAPosicion(npc, posicionesFila[indice]);
+            indice++;
         }
+    }
 
-        // Crea un nuevo NPC al final de la fila
-        CrearNPC(posicionesFila.Count - 1);
+    System.Collections.IEnumerator RemoverNPCDespuesDeRetardo(GameObject npc)
+    {
+        // Espera un tiempo antes de eliminar al NPC
+        yield return new WaitForSeconds(3f);
+        Destroy(npc);
+
+        // Agrega un nuevo NPC al final de la fila
+        if (colaNPCs.Count < maximoEnFila)
+        {
+            CrearNPC(posicionesFila.Length - 1);
+        }
     }
 }

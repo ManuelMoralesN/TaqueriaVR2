@@ -2,19 +2,18 @@ using UnityEngine;
 
 public class MesaController : MonoBehaviour
 {
-    public FilaController filaController; // Referencia a la fila
-    public string pedidoEsperado; // Pedido esperado
+    public FilaController filaController; // Referencia al script FilaController
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Taco")) // Si es un taco
+        // Comprueba si el objeto entregado es el pedido correcto (puedes personalizar esta lógica)
+        if (other.CompareTag("Pedido"))
         {
-            TacoController taco = other.GetComponent<TacoController>();
-            if (taco != null && taco.tipoTaco == pedidoEsperado) // Verifica si el pedido es correcto
-            {
-                filaController.AvanzarFila(); // Llama al siguiente NPC
-                Destroy(other.gameObject); // Destruye el taco
-            }
+            // Llama a AvanzarFila en el FilaController
+            filaController.AvanzarFila();
+
+            // Opcional: destruir el objeto del pedido entregado
+            Destroy(other.gameObject);
         }
     }
 }
