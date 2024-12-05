@@ -1,47 +1,51 @@
 using UnityEngine;
-using UnityEngine.AI;
+using TMPro;
+using System.Collections.Generic;
 
 public class NPCController : MonoBehaviour
 {
-    public string ordenActual = ""; // La orden que este NPC pedirá
-    public bool atendido = false;   // Indica si ya fue atendido
-    private NavMeshAgent agente;
+    public TMP_Text pedidoText; // Referencia al pedido que se muestra sobre el NPC
+    public string pedidoActual; // El pedido asignado al NPC
+    public bool atendido = false;
+    public FilaController filaController;
+
+    private List<string> tiposTacos = new List<string> { "Pastor", "Suaperro" };
+    private List<string> tiposBebidas = new List<string> { "Coca bien fría", "Caguama" };
 
     void Start()
     {
-        agente = GetComponent<NavMeshAgent>();
+        GenerarPedido();
+    }
+
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            AtenderPedido();
+        }
+    }
+
+    public void GenerarPedido()
+    {
+        // Generar cantidades aleatorias entre 1 y 9
+        int cantidadTacos = Random.Range(1, 10);
+        int cantidadBebidas = Random.Range(1, 10);
+
+        // Elegir un tipo de taco y una bebida al azar
+        string tacoSeleccionado = tiposTacos[Random.Range(0, tiposTacos.Count)];
+        string bebidaSeleccionada = tiposBebidas[Random.Range(0, tiposBebidas.Count)];
+
+        // Formar el pedido
+        pedidoActual = $"{cantidadTacos} tacos de {tacoSeleccionado} y {cantidadBebidas} {bebidaSeleccionada}(s)";
+        pedidoText.text = pedidoActual; // Actualiza el texto del pedido sobre el NPC
     }
 
     public void MoverHacia(Transform destino)
     {
-        // Mueve al NPC hacia el destino especificado
-        if (agente != null && destino != null)
-        {
-            agente.SetDestination(destino.position);
+        if(!atendido){
+        atendido = false;
+        pedidoText.text = ""; // Borra el texto al atender
+        filaController.AvanzarFila();
         }
-    }
-
-    public void GenerarOrden()
-    {
-        // Genera una orden aleatoria (por ahora, siempre será un taco)
-        ordenActual = "1xTaco"; // Aquí puedes expandir la lógica para órdenes aleatorias
-        Debug.Log($"{gameObject.name} ha generado una orden: {ordenActual}");
-    }
-
-    public void Atender()
-    {
-        // Marca al NPC como atendido y detiene su movimiento
-        atendido = true;
-        if (agente != null)
-        {
-            agente.isStopped = true;
-        }
-    }
-
-    public void Retirarse()
-    {
-        // Lógica para que el NPC se retire (puede ser destruirlo o moverlo fuera de la escena)
-        Debug.Log($"{gameObject.name} ha sido atendido y se retira.");
-        Destroy(gameObject, 1f); // Destruye el NPC después de 1 segundo
     }
 }

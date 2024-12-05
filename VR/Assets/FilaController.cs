@@ -23,15 +23,22 @@ public class FilaController : MonoBehaviour
         }
     }
 
-    void CrearNPC(int indice)
+    private void CrearNPC(int posicion)
+{
+    GameObject npc = Instantiate(npcPrefab, posicionesFila[posicion].position, Quaternion.identity);
+
+    NPCController npcController = npc.GetComponent<NPCController>();
+    if (npcController != null)
     {
-        // Crea un NPC en la posición correspondiente de la fila
-        GameObject nuevoNPC = Instantiate(prefabNPC, posicionesFila[indice].position, Quaternion.identity);
-        colaNPCs.Enqueue(nuevoNPC);
-        MoverNPCAPosicion(nuevoNPC, posicionesFila[indice]);
+        npcController.filaController = this; // Conectar al controlador de fila
+        npcController.GenerarPedido(); // Generar el pedido inicial
     }
 
-    void MoverNPCAPosicion(GameObject npc, Transform posicionObjetivo)
+    filaNPCs.Enqueue(npc);
+}
+
+
+    public void AvanzarFila()
     {
         // Mueve al NPC a la posición objetivo utilizando NavMesh
         NavMeshAgent agente = npc.GetComponent<NavMeshAgent>();
@@ -73,16 +80,7 @@ public class FilaController : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator RemoverNPCDespuesDeRetardo(GameObject npc)
-    {
-        // Espera un tiempo antes de eliminar al NPC
-        yield return new WaitForSeconds(3f);
-        Destroy(npc);
-
-        // Agrega un nuevo NPC al final de la fila
-        if (colaNPCs.Count < maximoEnFila)
-        {
-            CrearNPC(posicionesFila.Length - 1);
-        }
+        // Crea un nuevo NPC al final de la fila y genera su pedido
+        CrearNPC(posicionesFila.Count - 1);
     }
-}
+
