@@ -24,18 +24,20 @@ public class FilaController : MonoBehaviour
     }
 
     private void CrearNPC(int posicion)
+{
+    Quaternion newRotation = Quaternion.Euler(0, 180, 0); // Rotar al NPC para que mire hacia adelante
+    GameObject npc = Instantiate(npcPrefab, posicionesFila[posicion].position, newRotation); // Crear NPC con la rotación correcta
+
+    NPCController npcController = npc.GetComponent<NPCController>();
+    if (npcController != null)
     {
-        GameObject npc = Instantiate(npcPrefab, posicionesFila[posicion].position, Quaternion.identity);
-
-        NPCController npcController = npc.GetComponent<NPCController>();
-        if (npcController != null)
-        {
-            npcController.filaController = this; // Conectar al controlador de fila
-            npcController.GenerarPedido(); // Generar el pedido inicial
-        }
-
-        filaNPCs.Enqueue(npc);
+        npcController.filaController = this; // Conectar al controlador de fila
+        npcController.GenerarPedido(); // Generar el pedido inicial
     }
+
+    filaNPCs.Enqueue(npc); // Agregar el NPC a la cola
+}
+
 
     public void AvanzarFila()
     {
